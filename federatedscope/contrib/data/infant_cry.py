@@ -10,29 +10,36 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from torchvision import models
-
 from tqdm import tqdm
 from federatedscope.register import register_data
 
+
 def load_my_data(config, client_cfgs=None):
     from federatedscope.core.data import BaseDataTranslator
+    from federatedscope.core.data import DummyDataTranslator
     # Load a dataset, whose class is `torch.utils.data.Dataset`
-    train_dataset = InfantDataset(
-        file_list=train_list, transform=ImageTransform(size, mean, std), phase='train')
-    val_dataset = InfantDataset(
-        file_list=val_list, transform=ImageTransform(size, mean, std), phase='val')
-		# Instantiate a translator according to config
+    # train_dataset = InfantDataset(
+    # file_list=train_list, transform=ImageTransform(size, mean, std), phase='train') # noqa
+    # val_dataset = InfantDataset(
+    # file_list=val_list, transform=ImageTransform(size, mean, std), phase='val') # noqa
+    dataset = InfantDataset(file_list=train_list,
+                            transform=ImageTransform(size, mean, std),
+                            phase='train')
+    # Instantiate a translator according to config
     translator = BaseDataTranslator(config, client_cfgs)
+    # translator = DummyDataTranslator(config, client_cfgs)
     # Translate torch dataset to FS data
-    fs_data = translator([train_dataset, [], val_dataset])
+    # fs_data = translator([train_dataset, [], val_dataset])
+    fs_data = translator(dataset)
     return fs_data, config
 
-def call_my_data(config):
-     if config.data.type == "mydata":
-         data, modified_config = load_my_data(config)
-         return data, modified_config
-    
+
+def call_my_data(config, client_cfgs=None):
+    if config.data.type == "mydata":
+        data, modified_config = load_my_data(config)
+        return data, modified_config
+
+
 register_data("mydata", call_my_data)
 
 
@@ -52,12 +59,12 @@ class ImageTransform():
     std : (R, G, B)
         各色チャネルの標準偏差。
     """
-
     def __init__(self, resize, mean, std):
         self.data_transform = {
             'train': transforms.Compose([
-                transforms.RandomResizedCrop(
-                    resize, scale=(0.5, 1.0)),  # データオーギュメンテーション
+                transforms.RandomResizedCrop(resize,
+                                             scale=(0.5,
+                                                    1.0)),  # データオーギュメンテーション
                 transforms.RandomHorizontalFlip(),  # データオーギュメンテーション
                 transforms.ToTensor(),  # テンソルに変換
                 transforms.Normalize(mean, std)  # 標準化
@@ -79,6 +86,7 @@ class ImageTransform():
         """
         return self.data_transform[phase](img)
 
+
 def make_datapath_list(phase="train"):
     """
     データのパスを格納したリストを作成する。
@@ -94,8 +102,8 @@ def make_datapath_list(phase="train"):
         データへのパスを格納したリスト
     """
 
-    rootpath = "/content/drive/MyDrive/NakaoLab/donateacry-corpus-master/donateacry-android-upload-bucket-jpg-copy/"
-    target_path = osp.join(rootpath+phase+'/*.jpg')
+    rootpath = "data/donateacry-android-upload-bucket-jpg-copy"
+    target_path = osp.join(rootpath + phase + '/*.jpg')
     print(target_path)
 
     path_list = []  # ここに格納する
@@ -105,6 +113,7 @@ def make_datapath_list(phase="train"):
         path_list.append(path)
 
     return path_list
+
 
 class InfantDataset(data.Dataset):
     """
@@ -119,7 +128,6 @@ class InfantDataset(data.Dataset):
     phase : 'train' or 'test'
         学習か訓練かを設定する。
     """
-
     def __init__(self, file_list, transform=None, phase='train'):
         self.file_list = file_list  # ファイルパスのリスト
         self.transform = transform  # 前処理クラスのインスタンス
@@ -162,6 +170,7 @@ class InfantDataset(data.Dataset):
 
         return img_transformed, label
 
+
 train_list = make_datapath_list(phase="train")
 val_list = make_datapath_list(phase="val")
 
@@ -169,5 +178,3 @@ val_list = make_datapath_list(phase="val")
 size = 224
 mean = (0.485, 0.456, 0.406)
 std = (0.229, 0.224, 0.225)
-
-

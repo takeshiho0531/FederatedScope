@@ -27,9 +27,11 @@ class BaseDataTranslator:
             global_cfg: global CfgNode
             client_cfgs: client cfg `Dict`
         """
+        print("global_cfg", global_cfg)
         self.global_cfg = global_cfg
         self.client_cfgs = client_cfgs
         self.splitter = get_splitter(global_cfg)
+        print("self.splitter", self.splitter)
 
     def __call__(self, dataset):
         """
@@ -108,6 +110,7 @@ class BaseDataTranslator:
         client_num = self.global_cfg.federate.client_num
         split_train, split_val, split_test = [[None] * client_num] * 3
         train_label_distribution = None
+        print("len(train)", len(train), train)
 
         # Split train/val/test to client
         if len(train) > 0:
