@@ -48,6 +48,8 @@ def get_runner(server_class,
     # cfg object
     if runner_cls is StandaloneMultiGPURunner:
         data = None
+    print("data_runner_cls",
+          data)  # data_runner_cls {0: {}, 1: {}, 2: {}, 3: {}}になってしまってる
 
     return runner_cls(data=data,
                       server_class=server_class,

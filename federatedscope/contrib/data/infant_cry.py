@@ -18,19 +18,23 @@ def load_my_data(config, client_cfgs=None):
     from federatedscope.core.data import BaseDataTranslator
     from federatedscope.core.data import DummyDataTranslator
     # Load a dataset, whose class is `torch.utils.data.Dataset`
-    # train_dataset = InfantDataset(
-    # file_list=train_list, transform=ImageTransform(size, mean, std), phase='train') # noqa
-    # val_dataset = InfantDataset(
-    # file_list=val_list, transform=ImageTransform(size, mean, std), phase='val') # noqa
-    dataset = InfantDataset(file_list=train_list,
-                            transform=ImageTransform(size, mean, std),
-                            phase='train')
+    train_dataset = InfantDataset(file_list=train_list,
+                                  transform=ImageTransform(size, mean, std),
+                                  phase='train')  # noqa
+    val_dataset = InfantDataset(file_list=val_list,
+                                transform=ImageTransform(size, mean, std),
+                                phase='val')  # noqa
+    # dataset = InfantDataset(file_list=train_list,
+    # transform=ImageTransform(size, mean, std),
+    # phase='train')
     # Instantiate a translator according to config
     translator = BaseDataTranslator(config, client_cfgs)
     # translator = DummyDataTranslator(config, client_cfgs)
     # Translate torch dataset to FS data
-    # fs_data = translator([train_dataset, [], val_dataset])
-    fs_data = translator(dataset)
+    fs_data = translator([train_dataset, [], val_dataset])
+    # fs_data = translator(dataset)
+    # print("dataset", dataset)
+    print("fs_data", fs_data)
     return fs_data, config
 
 

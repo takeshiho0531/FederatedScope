@@ -27,11 +27,9 @@ class BaseDataTranslator:
             global_cfg: global CfgNode
             client_cfgs: client cfg `Dict`
         """
-        print("global_cfg", global_cfg)
         self.global_cfg = global_cfg
         self.client_cfgs = client_cfgs
         self.splitter = get_splitter(global_cfg)
-        print("self.splitter", self.splitter)
 
     def __call__(self, dataset):
         """

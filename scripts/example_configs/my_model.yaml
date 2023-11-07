@@ -11,7 +11,7 @@ federate:
 data:
   root: data/
   type: mydata
-  splits: [0.6,0.2,0.2]
+  splits: [0.7,0,0.2]
   splitter: 'lda'
   subsample: 0.05
   transform: [['ToTensor'], ['Normalize', {'mean': [0.9637], 'std': [0.1592]}]]
