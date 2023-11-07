@@ -4,15 +4,12 @@ early_stop:
   patience: 5
 seed: 12345
 federate:
-  mode: standalone
-  total_round_num: 300
-  sample_client_rate: 0.2
   client_num: 3
+  mode: standalone
 data:
   root: data/
   type: mydata
   splits: [0.7,0,0.2]
-  splitter: 'lda'
   subsample: 0.05
   transform: [['ToTensor'], ['Normalize', {'mean': [0.9637], 'std': [0.1592]}]]
 dataloader:

@@ -18,6 +18,7 @@ class DummyDataTranslator(BaseDataTranslator):
         """
         if not isinstance(dataset, dict):
             raise TypeError(f'Not support data type {type(dataset)}')
+        print("dataset", dataset)
         datadict = {}
         for client_id in dataset.keys():
             if self.client_cfgs is not None:

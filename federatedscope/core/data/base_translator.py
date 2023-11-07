@@ -73,6 +73,7 @@ class BaseDataTranslator:
         else:
             splits = self.global_cfg.data.splits
         if isinstance(dataset, tuple):
+            print(dataset)
             # No need to split train/val/test for tuple dataset.
             error_msg = 'If dataset is tuple, it must contains ' \
                         'train, valid and test split.'

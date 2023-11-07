@@ -12,30 +12,31 @@ import torch.optim as optim
 
 from tqdm import tqdm
 from federatedscope.register import register_data
+from federatedscope.core.data.utils import convert_data_mode
+from federatedscope.core.auxiliaries.utils import setup_seed
 
 
 def load_my_data(config, client_cfgs=None):
-    from federatedscope.core.data import BaseDataTranslator
     from federatedscope.core.data import DummyDataTranslator
-    # Load a dataset, whose class is `torch.utils.data.Dataset`
-    train_dataset = InfantDataset(file_list=train_list,
-                                  transform=ImageTransform(size, mean, std),
-                                  phase='train')  # noqa
-    val_dataset = InfantDataset(file_list=val_list,
-                                transform=ImageTransform(size, mean, std),
-                                phase='val')  # noqa
-    # dataset = InfantDataset(file_list=train_list,
-    # transform=ImageTransform(size, mean, std),
-    # phase='train')
-    # Instantiate a translator according to config
-    translator = BaseDataTranslator(config, client_cfgs)
-    # translator = DummyDataTranslator(config, client_cfgs)
-    # Translate torch dataset to FS data
-    fs_data = translator([train_dataset, [], val_dataset])
-    # fs_data = translator(dataset)
-    # print("dataset", dataset)
-    print("fs_data", fs_data)
-    return fs_data, config
+    setup_seed(12345)
+    train_list = make_datapath_list(phase="train")
+    dataset = InfantDataset(file_list=train_list,
+                            transform=ImageTransform(size, mean, std),
+                            phase='train')
+    print("len(dataset)", len(dataset))
+    client_num = min(len(dataset), config.federate.client_num
+                     ) if config.federate.client_num > 0 else len(dataset)
+    print("client_num", client_num)
+    config.merge_from_list(['federate.client_num', client_num])
+    # Convert list to dict
+    data_dict = dict()
+    for client_idx in range(1, client_num + 1):
+        data_dict[client_idx] = dataset[client_idx - 1]
+    translator = DummyDataTranslator(config, client_cfgs)
+    data = translator(data_dict)
+    data = convert_data_mode(data, config)
+    setup_seed(config.seed)
+    return data, config
 
 
 def call_my_data(config, client_cfgs=None):
@@ -106,7 +107,7 @@ def make_datapath_list(phase="train"):
         データへのパスを格納したリスト
     """
 
-    rootpath = "data/donateacry-android-upload-bucket-jpg-copy"
+    rootpath = "data/donateacry-android-upload-bucket-jpg-copy/"
     target_path = osp.join(rootpath + phase + '/*.jpg')
     print(target_path)
 
@@ -166,17 +167,17 @@ class InfantDataset(data.Dataset):
         elif label == "bu":
             label = 1
         elif label == "bp":
-            label = 1
+            label = 2
         elif label == "dc":
-            label = 1
+            label = 3
         elif label == "ti":
-            label = 1
+            label = 4
 
         return img_transformed, label
 
 
-train_list = make_datapath_list(phase="train")
-val_list = make_datapath_list(phase="val")
+# train_list = make_datapath_list(phase="train")
+# val_list = make_datapath_list(phase="val")
 
 # Datasetを作成する
 size = 224
