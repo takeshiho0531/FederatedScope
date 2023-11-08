@@ -27,7 +27,8 @@ def load_my_data(config, client_cfgs=None):
     dataset = InfantDataset(root=path,
                             s_frac=config.data.subsample,
                             tr_frac=splits[0],
-                            val_frac=splits[1])
+                            val_frac=splits[1],
+                            transform=ImageTransform(size, mean, std))
     print("len(dataset)", len(dataset))
     client_num = min(len(dataset), config.federate.client_num
                      ) if config.federate.client_num > 0 else len(dataset)
@@ -124,7 +125,11 @@ class InfantDataset(data.Dataset):
         self.val_frac = val_frac
         self.seed = seed
         self.train_tasks_frac = train_tasks_frac  # ??
-        super(InfantDataset, self).__init__(root, transform, target_transform)
+        self.transform = transform
+        self.root = "/FederatedScope/data/example/"
+
+    def __len__(self):
+        return len([f.path for f in os.scandir(self.root) if f.is_dir()])
 
     def __getitem__(self, index):
         """
@@ -140,14 +145,16 @@ class InfantDataset(data.Dataset):
 
         # index番目の画像をロード
         train_img_path = glob.glob(
-            os.path.join((self.root + str(index) + "train", '*.jpeg')))
+            os.path.join(self.root + str(index) + "/train", '*.jpg'))
         test_img_path = glob.glob(
-            os.path.join((self.root + str(index) + "test", '*.jpeg')))
+            os.path.join(self.root + str(index) + "/test", '*.jpg'))
         val_img_path = glob.glob(
-            os.path.join((self.root + str(index) + "val", '*.jpeg')))
-        train_img = Image.open(train_img_path)  # [高さ][幅][色RGB]
-        test_img = Image.open(test_img_path)
-        val_img = Image.open(val_img_path)
+            os.path.join(self.root + str(index) + "/val", '*.jpg'))
+        print("train_img_path", train_img_path)
+        print(self.root + str(index) + "train")
+        train_img = Image.open(train_img_path[0])  # [高さ][幅][色RGB]
+        test_img = Image.open(test_img_path[0])
+        val_img = Image.open(val_img_path[0])
 
         # 画像の前処理を実施
         train_img_transformed = self.transform(

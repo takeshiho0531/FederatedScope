@@ -361,9 +361,10 @@ class StandaloneRunner(BaseRunner):
             trainer_representative.print_trainer_meta_info()
 
     def _get_server_args(self, resource_info=None, client_resource_info=None):
-        print("server_data", self.data[self.server_id])  # {}になってしまってる
         print("self.data", self.data)  # self.data {0: {}, 1: {}, 2: {}, 3: {}}
         print("self.server_id", self.server_id)
+        # print("server_data", self.data[self.server_id])  # {}になってしまってる
+
         if self.server_id in self.data:
             server_data = self.data[self.server_id]
             model = get_model(self.cfg.model,
