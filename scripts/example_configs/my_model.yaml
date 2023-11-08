@@ -6,6 +6,7 @@ seed: 12345
 federate:
   client_num: 3
   mode: standalone
+  total_round_num: 2
 data:
   root: data/
   type: mydata
