@@ -145,16 +145,16 @@ class InfantDataset(data.Dataset):
 
         # index番目の画像をロード
         train_img_path = glob.glob(
-            os.path.join(self.root + str(index) + "/train", '*.jpg'))
+            os.path.join(self.root + str(index) + "/train", '*.jpg'))[0]
         test_img_path = glob.glob(
-            os.path.join(self.root + str(index) + "/test", '*.jpg'))
+            os.path.join(self.root + str(index) + "/test", '*.jpg'))[0]
         val_img_path = glob.glob(
-            os.path.join(self.root + str(index) + "/val", '*.jpg'))
+            os.path.join(self.root + str(index) + "/val", '*.jpg'))[0]
         print("train_img_path", train_img_path)
         print(self.root + str(index) + "train")
-        train_img = Image.open(train_img_path[0])  # [高さ][幅][色RGB]
-        test_img = Image.open(test_img_path[0])
-        val_img = Image.open(val_img_path[0])
+        train_img = Image.open(train_img_path)  # [高さ][幅][色RGB]
+        test_img = Image.open(test_img_path)
+        val_img = Image.open(val_img_path)
 
         # 画像の前処理を実施
         train_img_transformed = self.transform(
@@ -186,7 +186,7 @@ def convert_label(label):
     elif label == "ti":
         label = 4
     else:
-        label = 5
+        label = 0  # TODO
     return label
 
 
