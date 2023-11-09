@@ -20,6 +20,7 @@ class LDASplitter(BaseSplitter):
 
     def __call__(self, dataset, prior=None, **kwargs):
         from torch.utils.data import Dataset, Subset
+        print("dataset", dataset)
 
         tmp_dataset = [ds for ds in dataset]
         label = np.array([y for x, y in tmp_dataset])

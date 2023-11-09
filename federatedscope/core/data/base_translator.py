@@ -73,6 +73,7 @@ class BaseDataTranslator:
         else:
             splits = self.global_cfg.data.splits
         if isinstance(dataset, tuple):
+            print(dataset)
             # No need to split train/val/test for tuple dataset.
             error_msg = 'If dataset is tuple, it must contains ' \
                         'train, valid and test split.'
@@ -108,6 +109,7 @@ class BaseDataTranslator:
         client_num = self.global_cfg.federate.client_num
         split_train, split_val, split_test = [[None] * client_num] * 3
         train_label_distribution = None
+        print("len(train)", len(train), train)
 
         # Split train/val/test to client
         if len(train) > 0:

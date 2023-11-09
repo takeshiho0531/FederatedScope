@@ -51,6 +51,7 @@ class BaseRunner(object):
                  config=None,
                  client_configs=None):
         self.data = data
+        print("data", data)  # data {0: {}, 1: {}, 2: {}, 3: {}}になってる..
         self.server_class = server_class
         self.client_class = client_class
         assert config is not None, \
@@ -147,8 +148,8 @@ class BaseRunner(object):
         assert self.server_class is not None, \
             "`server_class` cannot be None."
         self.server_id = 0
-        server_data, model, kw = self._get_server_args(resource_info,
-                                                       client_resource_info)
+        server_data, model, kw = self._get_server_args(
+            resource_info, client_resource_info)  # server_data: {}になってしまってる
         self._server_device = self.gpu_manager.auto_choice()
         server = self.server_class(
             ID=self.server_id,
@@ -192,6 +193,7 @@ class BaseRunner(object):
             "`client_class` cannot be None"
         self.server_id = 0
         client_data, kw = self._get_client_args(client_id, resource_info)
+        print("client_data", client_data)  # プリントされてないs
         client_specific_config = self.cfg.clone()
         if self.client_cfgs:
             client_specific_config.defrost()
@@ -340,6 +342,7 @@ class StandaloneRunner(BaseRunner):
         self.client = dict()
         # assume the client-wise data are consistent in their input&output
         # shape
+        print("self.data[1]", self.data[1])
         self._shared_client_model = get_model(
             self.cfg.model, self.data[1], backend=self.cfg.backend
         ) if self.cfg.federate.share_local_model else None
@@ -358,6 +361,10 @@ class StandaloneRunner(BaseRunner):
             trainer_representative.print_trainer_meta_info()
 
     def _get_server_args(self, resource_info=None, client_resource_info=None):
+        print("self.data", self.data)  # self.data {0: {}, 1: {}, 2: {}, 3: {}}
+        print("self.server_id", self.server_id)
+        # print("server_data", self.data[self.server_id])  # {}になってしまってる
+
         if self.server_id in self.data:
             server_data = self.data[self.server_id]
             model = get_model(self.cfg.model,
@@ -366,6 +373,7 @@ class StandaloneRunner(BaseRunner):
         else:
             server_data = None
             data_representative = self.data[1]
+            print("data_representative", data_representative)
             model = get_model(
                 self.cfg.model, data_representative, backend=self.cfg.backend
             )  # get the model according to client's data if the server

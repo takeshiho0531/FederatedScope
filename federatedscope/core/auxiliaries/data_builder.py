@@ -118,6 +118,8 @@ def get_data(config, client_cfgs=None):
 
     for func in register.data_dict.values():
         data_and_config = func(config, client_cfgs)
+        print("func", func)
+        print("data_and_config", data_and_config)
         if data_and_config is not None:
             return data_and_config
 

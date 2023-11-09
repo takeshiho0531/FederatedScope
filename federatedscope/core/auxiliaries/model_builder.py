@@ -24,6 +24,7 @@ def get_shape_from_data(data, model_config, backend='torch'):
         shape (tuple): the input shape
     """
     # Handle some special cases
+    print("data", data)
     if model_config.type.lower() in ['vmfnet', 'hmfnet']:
         return data['train'].n_col if model_config.type.lower(
         ) == 'vmfnet' else data['train'].n_row
@@ -45,6 +46,7 @@ def get_shape_from_data(data, model_config, backend='torch'):
 
     if isinstance(data, dict):
         keys = list(data.keys())
+        print("keys", keys)
         if 'test' in keys:
             key_representative = 'test'
         elif 'val' in keys:
